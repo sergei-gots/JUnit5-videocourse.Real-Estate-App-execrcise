@@ -1,35 +1,30 @@
 package com.realestateapp;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 class ApartmentRaterTest {
 
     //a parameterized test with different values
-    @Test
-   // @CsvFileSource
-    void should_ReturnCorrectRating_When_CorrectApartment(){
+    @ParameterizedTest(name = "area={0}, price={1}, pricePerSqM={2}, givenRating={3}")
+    @CsvFileSource(resources = "apartment-rater-test-input-data.csv", numLinesToSkip = 1)
+    void should_ReturnCorrectRating_When_CorrectApartment(Double area, BigDecimal price, Double pricePerSqM, int expectedRating){
 
         //given
-
-     /*   List<Apartment> coders = new ArrayList<>();
-        coders.add(new Apartment(30, 3000);;
-        coders.add(new Coder(1.82, 98.0));
-        coders.add(new Coder(1.82, 64.7));
-        //double[] expected = {18.52, 29.59, 19.53};
-        double[] expected = {18.52, 29.59, 19.53};
+        Apartment apartment = new Apartment(area, price);
 
         //when
-        double[] bmiScores = BMICalculator.getBMIScores(coders);
+        int actualRating = ApartmentRater.rateApartment(apartment);
 
         //then
-        assertArrayEquals(expected, bmiScores);*/
+        assertEquals(actualRating, expectedRating);
     }
 
     void should_ReturnErrorValue_When_IncorrectApartment(){

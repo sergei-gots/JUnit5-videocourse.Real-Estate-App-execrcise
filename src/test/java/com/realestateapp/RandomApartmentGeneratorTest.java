@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.sql.SQLOutput;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -48,11 +49,15 @@ class RandomApartmentGeneratorTest {
         Apartment apartment = defaultRandomApartmentGenerator.generate();
         double area = apartment.getArea();
         BigDecimal price = apartment.getPrice();
-        double pricePerSquareMeter = price.doubleValue() / area;
+        BigDecimal minPrice = new BigDecimal(area * MIN_PRICE_PRO_SQM);
+        BigDecimal maxPrice =  new BigDecimal(area * MAX_PRICE_PRO_SQM);
 
         //then
-        assertTrue(area >= MIN_AREA && area <= MAX_AREA);
-        assertTrue(pricePerSquareMeter >= MIN_PRICE_PRO_SQM && pricePerSquareMeter <= MAX_PRICE_PRO_SQM);
+        assertAll(
+                ()-> assertTrue(apartment.getArea() >= MIN_AREA),
+                ()-> assertTrue(apartment.getArea() <= MAX_AREA),
+                ()-> assertTrue(apartment.getPrice().compareTo(minPrice)>=0),
+                ()-> assertTrue(apartment.getPrice().compareTo(maxPrice)<=0)                );
 
     }
 
@@ -65,13 +70,15 @@ class RandomApartmentGeneratorTest {
                 + (MAX_MIN_PRICE_PRO_SQM - MIN_MIN_PRICE_PRO_SQM) * Math.random()));
     }
 
-    @RepeatedTest(value = 1000)
+    @RepeatedTest(value = 100)
     void should_GenerateCorrectApartment_When_CustomMinAreaMinPrice(){
         //given
         double minArea = generateRandomMinArea();
         BigDecimal minPricePerSquareMeter = generateMinPricePerSquareMeter();
-        System.out.print("minArea = " + minArea);
+
+        /* System.out.print("minArea = " + minArea);
         System.out.println("; minPricePerSquareMeter = " + minPricePerSquareMeter);
+        */
 
         RandomApartmentGenerator randomApartmentGenerator
                 = new RandomApartmentGenerator(minArea, minPricePerSquareMeter);
@@ -80,6 +87,23 @@ class RandomApartmentGeneratorTest {
         double area = apartment.getArea();
         BigDecimal price = apartment.getPrice();
         double pricePerSquareMeter = price.doubleValue() / area;
+
+
+        System.out.print(area);
+        System.out.print('\t');
+        System.out.print(price);
+        System.out.print('\t');
+        System.out.print(pricePerSquareMeter);
+        System.out.print('\t');
+        if(pricePerSquareMeter<6000){
+            System.out.print(0);
+        }else if (pricePerSquareMeter<8000){
+            System.out.print(1);
+        }else {
+            System.out.print(2);
+        }
+        System.out.println();
+
 
         //then
         assertTrue(area >= minArea && area <= minArea * MAX_MULTIPLIER);
